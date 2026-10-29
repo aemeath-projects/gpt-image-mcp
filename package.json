@@ -1,6 +1,6 @@
 {
   "name": "@aemeath-projects/gpt-image-mcp",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "GPT Image 图像生成与编辑 MCP 服务器",
   "type": "module",
   "main": "./dist/index.js",

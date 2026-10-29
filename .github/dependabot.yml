@@ -1,0 +1,10 @@
+version: 2
+
+updates:
+  # GitHub Actions 依赖
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'daily'
+    labels:
+      - 'dependencies'

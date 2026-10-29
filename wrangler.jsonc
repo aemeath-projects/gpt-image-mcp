@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gpt-image-mcp",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-10-22",
+  "observability": {
+    "enabled": true,
+    "traces": {
+      "enabled": true,
+    },
+    "issues": {
+      "enabled": true,
+    },
+  },
+  "cache": {
+    "enabled": true,
+  },
+  "workers_dev": false,
+  "preview_urls": false,
+  "vars": {
+    "ALLOWED_HOSTS": "",
+    "ALLOWED_ORIGINS": "",
+  },
+}

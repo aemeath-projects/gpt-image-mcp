@@ -147,3 +147,16 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Cloudflare Workers
+.wrangler/
+.wrangler-dry-run/
+.dev.vars*
+
+# IntelliJ Idea
+.idea/
+
+# Claude Code
+.serena
+.spec-workflow
+.playwright-mcp

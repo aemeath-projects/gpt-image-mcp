@@ -11,6 +11,8 @@ export interface CliOptions {
   path: string
   allowedHosts?: string[]
   allowedOrigins?: string[]
+  /** 入站鉴权 key，来自 MCP_API_KEY（逗号分隔）。 */
+  apiKeys?: string[]
   help: boolean
   version: boolean
 }
@@ -58,6 +60,7 @@ export function parseCliOptions(
     path,
     allowedHosts: parseList(env.MCP_ALLOWED_HOSTS),
     allowedOrigins: parseList(env.MCP_ALLOWED_ORIGINS),
+    apiKeys: parseList(env.MCP_API_KEY),
     help: values.help === true,
     version: values.version === true,
   }

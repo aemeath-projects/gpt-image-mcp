@@ -4,6 +4,7 @@ import { toNodeHandler } from '@modelcontextprotocol/node'
 import { localhostAllowedHostnames, localhostAllowedOrigins } from '@modelcontextprotocol/server'
 
 import type { CliOptions } from './config.js'
+import type { ServerConfig } from './gpt-image/config.js'
 import { createFetchHandler } from './http.js'
 
 /** SDK 的 localhost 名单用于匹配 Host 头；`::1` 是 `server.listen` 的裸 IPv6 绑定形式。 */
@@ -18,7 +19,10 @@ const LOCALHOST_HOSTNAMES = new Set([...localhostAllowedHostnames(), '::1'])
  * Host/Origin 校验统一由 `createFetchHandler` 完成：显式配置的 allowlist 原样生效，
  * 绑定 localhost 且未配置时降级为 SDK 的 localhost 默认 allowlist。
  */
-export function startHttpServer(options: CliOptions): ReturnType<typeof createHttpServer> {
+export function startHttpServer(
+  options: CliOptions,
+  serverConfig: ServerConfig,
+): ReturnType<typeof createHttpServer> {
   const isLocalhost = LOCALHOST_HOSTNAMES.has(options.host)
 
   if (options.allowedHosts === undefined && !isLocalhost) {
@@ -33,10 +37,18 @@ export function startHttpServer(options: CliOptions): ReturnType<typeof createHt
     )
   }
 
+  if (options.apiKeys === undefined && !isLocalhost) {
+    console.warn(
+      `未配置 MCP_API_KEY，且绑定地址 ${options.host} 不是 localhost；HTTP 端点未启用入站鉴权，请确保反向代理已完成鉴权。`,
+    )
+  }
+
   const handler = createFetchHandler({
     path: options.path,
     allowedHosts: options.allowedHosts ?? (isLocalhost ? localhostAllowedHostnames() : undefined),
     allowedOrigins: options.allowedOrigins ?? (isLocalhost ? localhostAllowedOrigins() : undefined),
+    apiKeys: options.apiKeys,
+    serverConfig,
   })
 
   const nodeHandler = toNodeHandler(handler, {

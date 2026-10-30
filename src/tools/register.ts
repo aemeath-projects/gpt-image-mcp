@@ -1,19 +1,51 @@
 import { ToolError } from '../errors.js'
 
-type ToolResult =
+interface TextContent {
+  type: 'text'
+  text: string
+}
+
+interface ImageContent {
+  type: 'image'
+  data: string
+  mimeType: string
+}
+
+export type ToolContent = TextContent | ImageContent
+
+export type ToolResult =
   | {
-      content: { type: 'text'; text: string }[]
+      content: ToolContent[]
       structuredContent: Record<string, unknown>
     }
   | {
       isError: true
-      content: { type: 'text'; text: string }[]
+      content: TextContent[]
     }
 
 /** 成功结果：Markdown 文本 + 满足 outputSchema 的结构化数据。 */
 export function ok(data: Record<string, unknown>, markdown: string): ToolResult {
   return {
     content: [{ type: 'text', text: markdown }],
+    structuredContent: data,
+  }
+}
+
+/** 成功结果：Markdown 文本 + MCP image content + 结构化元数据。 */
+export function okImages(
+  data: Record<string, unknown>,
+  markdown: string,
+  images: readonly { base64: string; mimeType: string }[],
+): ToolResult {
+  return {
+    content: [
+      { type: 'text', text: markdown },
+      ...images.map((image) => ({
+        type: 'image' as const,
+        data: image.base64,
+        mimeType: image.mimeType,
+      })),
+    ],
     structuredContent: data,
   }
 }

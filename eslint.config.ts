@@ -106,6 +106,7 @@ export default defineConfig(
   {
     files: [
       'src/index.ts',
+      'src/auth.ts',
       'src/http.ts',
       'src/server.ts',
       'src/worker.ts',

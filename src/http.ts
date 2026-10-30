@@ -5,6 +5,8 @@ import {
   type McpHttpHandler,
 } from '@modelcontextprotocol/server'
 
+import { checkApiKeys, unauthorizedResponse } from './auth.js'
+import type { ServerConfig } from './gpt-image/config.js'
 import { createServer } from './server.js'
 
 export interface FetchHandlerOptions {
@@ -14,6 +16,10 @@ export interface FetchHandlerOptions {
   allowedHosts?: string[]
   /** 允许的 Origin 主机名；未配置时跳过校验。 */
   allowedOrigins?: string[]
+  /** 入站鉴权 key；未配置或为空时不校验。 */
+  apiKeys?: string[]
+  /** 工具运行配置；未提供时由 `createServer` 从进程环境变量解析。 */
+  serverConfig?: ServerConfig
 }
 
 /**
@@ -24,17 +30,15 @@ export type FetchHandler = Pick<McpHttpHandler, 'fetch' | 'close' | 'notify' | '
 
 const DEFAULT_PATH = '/mcp'
 
-const mcpHandler = createMcpHandler(createServer)
-
 /**
  * 创建 web-standard 的 MCP 请求处理器，可同时用于 Node 与 Cloudflare Workers。
  *
- * Host/Origin 校验在此统一完成，Node 与 Worker 两侧不重复实现；SDK 的
- * `createMcpHandler` 本身刻意不做校验，因此这里是唯一的校验层。
+ * Host/Origin 校验与入站鉴权在此统一完成，Node 与 Worker 两侧不重复实现。
  */
 export function createFetchHandler(options: FetchHandlerOptions = {}): FetchHandler {
   const path = options.path ?? DEFAULT_PATH
-  const { allowedHosts, allowedOrigins } = options
+  const { allowedHosts, allowedOrigins, apiKeys, serverConfig } = options
+  const mcpHandler = createMcpHandler(() => createServer(serverConfig))
 
   return {
     async fetch(request, requestOptions) {
@@ -60,6 +64,10 @@ export function createFetchHandler(options: FetchHandlerOptions = {}): FetchHand
         if (rejection !== undefined) {
           return rejection
         }
+      }
+
+      if (apiKeys !== undefined && apiKeys.length > 0 && !checkApiKeys(request, apiKeys)) {
+        return unauthorizedResponse()
       }
 
       return mcpHandler.fetch(request, requestOptions)

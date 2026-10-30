@@ -31,6 +31,13 @@ export const qualitySchema = z
   .default('medium')
   .describe('生成质量；xhigh 与 max 仅 gpt-image-2.5 系列支持。')
 
+export const reasoningEffortSchema = z
+  .enum(['minimal', 'low', 'medium', 'high'])
+  .optional()
+  .describe(
+    'Responses 文本模型的推理强度；省略时使用 GPT_IMAGE_REASONING_EFFORT（默认 high，设为 none 可禁用）。',
+  )
+
 export const backgroundSchema = z
   .enum(['transparent', 'opaque', 'auto'])
   .default('auto')

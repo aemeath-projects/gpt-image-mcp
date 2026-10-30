@@ -12,6 +12,7 @@ export interface Env {
   GPT_IMAGE_MODEL?: string
   GPT_IMAGE_EDIT_MODEL?: string
   GPT_IMAGE_RESPONSE_MODEL?: string
+  GPT_IMAGE_REASONING_EFFORT?: string
   GPT_IMAGE_TIMEOUT_MS?: string
   GPT_IMAGE_RESPONSES_TIMEOUT_MS?: string
   GPT_IMAGE_OUTPUT_ROOT?: string

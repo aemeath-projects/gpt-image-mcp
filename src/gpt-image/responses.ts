@@ -4,7 +4,7 @@ import { ToolError } from '../errors.js'
 
 import { bytesToDataUri, decodeBase64, isHttpUrl, parseBase64DataUri } from './base64.js'
 import { GptImageApiError } from './client.js'
-import type { GptImageConfig } from './config.js'
+import type { GptImageConfig, ReasoningEffort } from './config.js'
 import { detectImageMimeType, type ImageIO } from './files.js'
 import type { GeneratedImage } from './images.js'
 import { validateImageOptions, type ImageBackground, type ImageQuality } from './models.js'
@@ -18,6 +18,8 @@ export interface ResponsesImageOptions {
   readonly model: string
   /** Responses API 顶层的文本模型。 */
   readonly textModel: string
+  /** 文本模型的推理强度；`undefined` 表示不发送 `reasoning`。 */
+  readonly reasoningEffort?: ReasoningEffort
   readonly size: string
   readonly quality: ImageQuality
   readonly background: ImageBackground
@@ -74,6 +76,10 @@ export async function generateViaResponses(
 
   if (options.previousResponseId !== undefined && options.previousResponseId.length > 0) {
     body.previous_response_id = options.previousResponseId
+  }
+
+  if (options.reasoningEffort !== undefined) {
+    body.reasoning = { effort: options.reasoningEffort }
   }
 
   const response = await requestJson(

@@ -115,16 +115,17 @@ Claude Desktop 配置示例：
 
 ### `generate_image_via_responses`
 
-| 参数                                   | 类型/默认                         | 说明                              |
-| -------------------------------------- | --------------------------------- | --------------------------------- |
-| `prompt`                               | string，1–32000，必填             | 提示词                            |
-| `images`                               | string[]，0–16，可选              | 作为 `input_image` 传入           |
-| `model`                                | string，默认 `GPT_IMAGE_MODEL`    | `image_generation` 工具的图像模型 |
-| `text_model`                           | string，默认 `gpt-6-astra`        | Responses 顶层文本模型            |
-| `size` / `quality` / `background`      | 同上                              | 传给 `image_generation` 工具      |
-| `action`                               | `auto/generate/edit`，默认 `auto` | 工具动作                          |
-| `previous_response_id`                 | string，可选                      | 多轮编辑                          |
-| `output_path` / `overwrite` / `inline` | 同上                              | 落盘与内联控制                    |
+| 参数                                   | 类型/默认                              | 说明                                        |
+| -------------------------------------- | -------------------------------------- | ------------------------------------------- |
+| `prompt`                               | string，1–32000，必填                  | 提示词                                      |
+| `images`                               | string[]，0–16，可选                   | 作为 `input_image` 传入                     |
+| `model`                                | string，默认 `GPT_IMAGE_MODEL`         | `image_generation` 工具的图像模型           |
+| `text_model`                           | string，默认 `gpt-6-astra`             | Responses 顶层文本模型                      |
+| `size` / `quality` / `background`      | 同上                                   | 传给 `image_generation` 工具                |
+| `action`                               | `auto/generate/edit`，默认 `auto`      | 工具动作                                    |
+| `effort`                               | `minimal/low/medium/high`，默认 `high` | 文本模型推理强度，映射到 `reasoning.effort` |
+| `previous_response_id`                 | string，可选                           | 多轮编辑                                    |
+| `output_path` / `overwrite` / `inline` | 同上                                   | 落盘与内联控制                              |
 
 成功结果的 `structuredContent` 包含 `model`、`images[]`（`mimeType`、`bytes`、
 可选 `path` / `revisedPrompt`）、`saved_paths`、`usage` 等字段；Responses 工具额外返回
@@ -234,6 +235,7 @@ CLI 参数优先级高于环境变量。所有 `GPT_IMAGE_*` 变量由服务启�
 | —                           | `GPT_IMAGE_MODEL`                | `gpt-image-2.5-flare`    | 生成默认模型                               |
 | —                           | `GPT_IMAGE_EDIT_MODEL`           | `gpt-image-2.5-sunburst` | 编辑默认模型                               |
 | —                           | `GPT_IMAGE_RESPONSE_MODEL`       | `gpt-6-astra`            | Responses 顶层文本模型                     |
+| —                           | `GPT_IMAGE_REASONING_EFFORT`     | `high`                   | Responses 推理强度；`none` 表示不发送      |
 | —                           | `GPT_IMAGE_TIMEOUT_MS`           | `120000`                 | Images 请求超时（1000–900000）             |
 | —                           | `GPT_IMAGE_RESPONSES_TIMEOUT_MS` | `300000`                 | Responses 请求超时（1000–900000）          |
 | —                           | `GPT_IMAGE_OUTPUT_ROOT`          | 未设置                   | 设置后 `output_path` 必须位于该目录        |

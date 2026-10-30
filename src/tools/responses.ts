@@ -16,6 +16,7 @@ import {
   overwriteSchema,
   promptSchema,
   qualitySchema,
+  reasoningEffortSchema,
   sizeSchema,
 } from './schemas.js'
 
@@ -28,6 +29,7 @@ const responsesInputSchema = z.object({
   quality: qualitySchema,
   background: backgroundSchema,
   action: z.enum(['auto', 'generate', 'edit']).default('auto'),
+  effort: reasoningEffortSchema,
   previous_response_id: z.string().min(1).max(256).optional(),
   output_path: outputPathSchema,
   overwrite: overwriteSchema,
@@ -66,6 +68,7 @@ export function registerResponsesTools(server: McpServer, config: ServerConfig):
           prompt: args.prompt,
           model,
           textModel,
+          reasoningEffort: args.effort ?? config.gptImage.reasoningEffort,
           size: args.size,
           quality: args.quality,
           background: args.background,

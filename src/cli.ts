@@ -32,6 +32,7 @@ GPT Image 环境变量：
   GPT_IMAGE_MODEL           生成默认模型（默认 gpt-image-2.5-flare）
   GPT_IMAGE_EDIT_MODEL      编辑默认模型（默认 gpt-image-2.5-sunburst）
   GPT_IMAGE_RESPONSE_MODEL  Responses 顶层文本模型（默认 gpt-6-astra）
+  GPT_IMAGE_REASONING_EFFORT      Responses 推理强度（默认 high；none 表示不发送）
   GPT_IMAGE_TIMEOUT_MS      Images 请求超时（默认 120000）
   GPT_IMAGE_RESPONSES_TIMEOUT_MS  Responses 请求超时（默认 300000）
   GPT_IMAGE_OUTPUT_ROOT     限制 output_path 的可写根目录

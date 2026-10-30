@@ -3,6 +3,7 @@ import { ToolError } from '../errors.js'
 import type { ImageIO } from './files.js'
 
 export type ResponseFormat = 'url' | 'b64_json'
+export type ReasoningEffort = 'minimal' | 'low' | 'medium' | 'high'
 
 export interface GptImageConfig {
   readonly baseUrl: string
@@ -11,6 +12,8 @@ export interface GptImageConfig {
   readonly defaultModel: string
   readonly editModel: string
   readonly responsesModel: string
+  /** Responses 文本模型的推理强度；`undefined` 表示不发送 `reasoning`。 */
+  readonly reasoningEffort?: ReasoningEffort
   readonly timeoutMs: number
   readonly responsesTimeoutMs: number
   readonly outputRoot?: string
@@ -27,6 +30,7 @@ const DEFAULT_BASE_URL = 'https://api.openai.com'
 const DEFAULT_MODEL = 'gpt-image-2.5-flare'
 const DEFAULT_EDIT_MODEL = 'gpt-image-2.5-sunburst'
 const DEFAULT_RESPONSES_MODEL = 'gpt-6-astra'
+const DEFAULT_REASONING_EFFORT: ReasoningEffort = 'high'
 const DEFAULT_TIMEOUT_MS = 120_000
 const DEFAULT_RESPONSES_TIMEOUT_MS = 300_000
 const DEFAULT_MULTI_IMAGE_FIELD = 'image[]'
@@ -47,6 +51,7 @@ export function resolveGptImageConfig(
   }
 
   const outputRoot = optionalString(env.GPT_IMAGE_OUTPUT_ROOT)
+  const reasoningEffort = parseReasoningEffort(env.GPT_IMAGE_REASONING_EFFORT)
   const config: GptImageConfig = {
     baseUrl: normalizeBaseUrl(env.GPT_IMAGE_BASE_URL ?? DEFAULT_BASE_URL),
     defaultModel: optionalString(env.GPT_IMAGE_MODEL) ?? DEFAULT_MODEL,
@@ -68,6 +73,7 @@ export function resolveGptImageConfig(
     ...(apiKey === undefined ? {} : { apiKey }),
     ...(outputRoot === undefined ? {} : { outputRoot }),
     ...(responseFormat === undefined ? {} : { responseFormat }),
+    ...(reasoningEffort === undefined ? {} : { reasoningEffort }),
   }
 
   return withOptional
@@ -124,6 +130,32 @@ function optionalString(value: string | undefined): string | undefined {
 
   const trimmed = value.trim()
   return trimmed.length > 0 ? trimmed : undefined
+}
+
+function parseReasoningEffort(value: string | undefined): ReasoningEffort | undefined {
+  if (value === undefined) {
+    return DEFAULT_REASONING_EFFORT
+  }
+
+  const normalized = value.trim().toLowerCase()
+
+  // 空字符串、none、off 都表示显式不发送 reasoning 字段。
+  if (normalized === '' || normalized === 'none' || normalized === 'off') {
+    return undefined
+  }
+
+  if (
+    normalized === 'minimal' ||
+    normalized === 'low' ||
+    normalized === 'medium' ||
+    normalized === 'high'
+  ) {
+    return normalized
+  }
+
+  throw new ToolError(
+    `GPT_IMAGE_REASONING_EFFORT 只能是 minimal、low、medium、high，或设为 none 禁用，收到 "${value}"。`,
+  )
 }
 
 function parseTimeout(value: string | undefined, fallback: number, name: string): number {
